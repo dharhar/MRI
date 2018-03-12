@@ -1,0 +1,27 @@
+- name: install nfs
+  yum: name={{ item }} state=latest
+  with_items:
+    - rpcbind
+    - nfs-utils
+    - libnfsidmap
+
+- name: start rpcbind
+  systemd:
+    name: rpcbind
+    enabled: yes
+    state: started
+
+- name: start nfs
+  systemd:
+    name: nfs
+    enabled: yes
+    state: started
+
+- include_tasks: headnode.yml
+  when:
+    - "'controller' in group_names"
+
+- include_tasks: worknodes.yml
+  when:
+    - "'workers' in group_names"
+

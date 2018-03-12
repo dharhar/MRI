@@ -1,0 +1,40 @@
+
+- stat: path=/tmp/ANTs
+  register: antsdl
+
+- name: download ants git repo
+  git:
+    repo: 'https://github.com/ANTsX/ANTs.git'
+    dest: /tmp/ANTs/
+  when: not antsdl.stat.exists
+
+- name: create ants directory
+  file: path=/usr/local/ants state=directory mode=0755 owner=root
+
+- stat: path=/usr/local/ants/bin/
+  register: ants_bin
+
+- include_tasks: install.yml
+  when: not ants_bin.stat.exists
+
+
+- name: make script directory
+  file: path={{item}} state=directory owner={{main_user}} mode=0755
+  with_items:
+    - "{{ script_dir }}"
+
+
+- name: copy scripts
+  template: src={{item}} dest={{script_dir}} owner={{main_user}} mode=0777
+  with_items:
+    - antsCT2.sh
+    - antsCT_cv.sh
+    - antsCT.sh
+    - antsJLF.sh
+    - antsRegSyNQuick.sh
+    - antsRegSyN.sh
+    - batch-ANTsRegistrationSyNQuick.sh
+    - batch-ANTsRegistrationSyN.sh
+    - batch-ants-template_cv.sh
+    - batch-ants-template.sh
+

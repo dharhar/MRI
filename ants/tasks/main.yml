@@ -1,0 +1,23 @@
+- name: install packages
+  yum: name={{item}} state=latest
+  with_items:
+    - gcc
+    - git
+    - gcc-c++
+    - kernel-devel
+    - cmake
+    - make
+    - zlib-devel
+
+- include_tasks: headnode.yml
+  when:
+    - "'controller' in group_names"
+
+- name: set PATH
+  lineinfile:
+    dest=/etc/bashrc
+    line={{ item }}
+    state=present
+  with_items:
+    - "export ANTSPATH=/usr/local/ants/bin/"
+    - "export PATH=${ANTSPATH}:$PATH"

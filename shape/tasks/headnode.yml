@@ -1,0 +1,46 @@
+- stat: path=/{{ enigma_directory }}
+  register: enigdir
+
+- name: download shape
+  git:
+    repo: 'https://github.com/dharhar/shape.git'
+    dest: "{{ dl_directory }}"
+  when: not enigdir.stat.exists
+
+- name: remove old scripts
+  file: path=/{{dl_directory}}/{{item}} state=absent
+  with_items:
+    - batch_shape.qsub
+    - batch_shape.slurm
+    - after_shape.qsub
+    - after_shape.slurm
+    - gettherest.slurm
+    - gettherest.qsub
+
+- name: copy templated scripts to shape directory
+  template: src={{item}} dest={{dl_directory}} owner=root mode=0777
+  with_items:
+    - batch_shape.sh
+    - gettherest.sh
+    - after_shape.sh
+
+- name: make script directory
+  file: path={{item}} state=directory owner={{main_user}} mode=0755
+  with_items:
+    - "{{ script_dir }}"
+
+- name: copy templated scripts to script directory
+  template: src={{item}} dest={{script_dir}} owner={{main_user}} mode=0777
+  with_items:
+    - batch_shape.sh
+    - after_shape.sh
+
+- name: copy render script to PATH
+  copy:
+    src: /{{ dl_directory }}/viewer/render
+    dest: /usr/local/bin/
+    mode: 0777
+  remote_src: yes
+
+- name: make render directory writble
+  file: path=/{{ dl_directory }}/viewer/files/ mode=0777

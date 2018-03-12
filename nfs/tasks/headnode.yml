@@ -1,0 +1,18 @@
+
+- name: add dirs to exports file
+  lineinfile:
+    dest=/etc/exports
+    line={{ item }}
+    state=present
+  with_items:
+    - "/mnt 10.1.30.0/255.255.255.0(rw,async,no_root_squash,no_subtree_check)"
+    - "/usr/local 10.1.30.0/255.255.255.0(rw,async,no_root_squash,no_subtree_check)"
+
+- name: export filesystems
+  command: exportfs
+
+- name: restart nfs
+  systemd:
+    name: nfs
+    state: restarted
+

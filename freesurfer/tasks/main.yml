@@ -1,0 +1,21 @@
+- name: install yum packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - tcsh
+    - bc
+
+- include_tasks: headnode.yml
+  when:
+    - "'controller' in group_names"
+
+- name: set environment variable
+  lineinfile:
+    dest=/etc/bashrc
+    line={{ item }}
+    state=present
+  with_items:
+   - "export FREESURFER_HOME=/usr/local/freesurfer"
+   - "export SUBJECTS_DIR=/usr/local/freesurfer/subjects"
+   - "source $FREESURFER_HOME/SetUpFreeSurfer.sh"
+   - "PATH=$PATH:/usr/local/freesurfer/bin"
+   - "PATH=$PATH:$HOME/bin"

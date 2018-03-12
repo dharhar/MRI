@@ -1,0 +1,14 @@
+dl_directory: /usr/local/shape
+
+enigma_directory: "{{ dl_directory }}/enigma"
+
+#home mount: the parent of your home directory
+
+home_mount: mnt
+main_user : nfuser
+script_dir: /{{ home_mount }}/{{ main_user }}/scripts
+
+
+# The renderer setup is very primitive, hasn't been fully developed yet but is usable.
+# To use the renderer, put this line in the appropriate apache config file:
+#   Alias "/shape" "/usr/local/shape/viewer"

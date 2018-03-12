@@ -1,0 +1,7 @@
+
+
+home_mount: mnt
+main_user : nfuser
+
+
+script_dir: /{{ home_mount }}/{{ main_user }}/scripts

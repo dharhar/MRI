@@ -1,0 +1,36 @@
+- stat: path=/usr/local/freesurfer/bin
+  register: fsbin
+
+- include_tasks: install.yml
+  when: not fsbin.stat.exists
+  
+#- name: copy license
+  #copy: src=license.txt dest=/usr/local/freesurfer/license.txt owner=root group=root mode=0666
+  #when: "'controller' in group_names"
+
+
+- name: make script directory
+  file: path={{item}} state=directory owner={{main_user}} mode=0755
+  with_items:
+    - "{{ script_dir }}"
+
+
+- name: copy scripts
+  template: src={{item}} dest={{script_dir}} owner={{main_user}} mode=0777
+  with_items:
+    - batch_DOC_PHY.sh
+    - batch_FS_2.sh
+    - batch_FS_iSCORE.sh
+    - batch_FS_iSCORE_TP2.sh
+    - batch-FS_recon_all.sh
+    - batch_FS.sh
+    - cook-priors.sh
+    - FS_DOC_PHY_2.sh
+    - FS_DOC_PHY.sh
+    - FS_recon_all_2.sh
+    - FS_recon_all_iSCORE.sh
+    - FS_recon_all_iSCORE_TP2.sh
+    - FS_recon_all_long.sh
+    - FS_recon_all.sh
+    - FS_recon_all_template.sh
+    - generate-template.sh

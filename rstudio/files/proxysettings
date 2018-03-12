@@ -1,0 +1,21 @@
+#put these setting in /etc/httpd/conf.d/15-horizon_vost.conf or maybe /etc/httpd/conf/httpd.conf
+#cali works with the first one
+
+<VirtualHost *:80>
+
+  <Proxy *>
+    Allow from localhost
+  </Proxy>
+
+  RewriteEngine on
+  RewriteCond %{HTTP:Upgrade} =websocket
+  RewriteRule /rstudio/(.*)     ws://localhost:8787/$1  [P,L]
+  RewriteCond %{HTTP:Upgrade} !=websocket
+  RewriteRule /rstudio/(.*)     http://localhost:8787/$1 [P,L]
+  ProxyPass /rstudio/ http://localhost:8787/
+  ProxyPassReverse /rstudio/ http://localhost:8787/
+  ProxyPass /rstudio http://localhost:8787/
+  ProxyPassReverse /rstudio http://localhost:8787/
+  ProxyRequests Off
+
+</VirtualHost>

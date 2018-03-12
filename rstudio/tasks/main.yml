@@ -1,0 +1,10 @@
+
+- name: install packages
+  yum: name={{item}} state=latest
+  with_items:
+    - epel-release
+    - R
+
+- include_tasks: headnode.yml
+  when:
+    - "'controller' in group_names"

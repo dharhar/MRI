@@ -1,0 +1,16 @@
+
+- name: mount shared home dir
+  mount:
+    path: /mnt
+    src: "{{ head_node }}":/mnt
+    fstype: nfs
+    opts: rw,hard,rsize=8192,wsize=8192,timeo=14
+    state: mounted
+
+- name: mount shared prog dir
+  mount:
+    path: /usr/local
+    src: "{{ head_node }}":/usr/local
+    fstype: nfs
+    opts: rw,hard,rsize=8192,wsize=8192,timeo=14
+    state: mounted

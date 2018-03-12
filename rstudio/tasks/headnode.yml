@@ -1,0 +1,17 @@
+- name: download rstudio server
+  get_url: url={{ rs_url }} dest=/tmp/rstudio-server.rpm timeout=120
+
+- name: install rstudio server
+  yum:
+    name: /tmp/rstudio-server.rpm
+    state: present
+    disable_gpg_check: true
+
+- name: enable rstudio-server service
+  systemd:
+    name: rstudio-server
+    enabled: yes
+    state: started
+
+- name: put proxysettings file in etc/httpd
+  copy: src=proxysettings dest=/etc/httpd/proxysettings owner=root

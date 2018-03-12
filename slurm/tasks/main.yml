@@ -1,0 +1,111 @@
+---
+# tasks file for slurm
+
+- name: install epel repository
+  yum: name=epel-release state=present
+
+- name: install required packages
+  yum: name={{ item }} state=present
+  with_items:
+    - libselinux-python
+    - gcc
+    - munge
+    - munge-libs
+    - munge-devel
+    - hwloc
+    - pam-devel
+    - ncurses-devel
+    - gtk2-devel
+    - perl-devel
+    - perl-CPAN
+    - bzip2
+
+
+- stat: path=/etc/munge/munge.key
+  register: munge_key
+
+- name: create munge key
+  shell: echo -n "{{ munge_passwd }}" | sha512sum | cut -d' ' -f1 >/etc/munge/munge.key
+  notify: restart munge
+  when: not munge_key.stat.exists
+
+- name: Set correct permissions to munge.key
+  file: path=/etc/munge/munge.key owner=munge group=munge mode=0400
+
+- name: enable munge service
+  service: name=munge enabled=yes state=started
+
+- name: check if already installed
+  stat: path={{ slurm_prefix }}/bin
+  register: slurm_bin
+  changed_when: slurm_bin.stat.exists == False
+
+- include: install.yml
+  when: slurm_bin.stat.exists == False
+
+- name: copy slurmctl startup script
+  template: src=slurmctld.service.j2 dest=/usr/lib/systemd/system/slurmctld.service owner=root group=root mode=0700
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
+
+- name: copy slurm startup script
+  template: src=slurmd.service.j2 dest=/usr/lib/systemd/system/slurmd.service owner=root group=root mode=0700
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
+
+- name: create config directory
+  file: path={{ slurm_prefix }}/etc state=directory owner=root group=root mode=0755
+
+- name: copy slurm config
+  template: src=slurm.conf.j2 dest={{ slurm_prefix }}/etc/slurm.conf owner=root group=root mode=0644
+
+- name: copy slurmdbd config example
+  copy: src=slurmdbd.conf.example dest={{ slurm_prefix }}/etc owner=root group=root mode=0644
+
+- name: create slurm group
+  group: name=slurm gid=105 state=present
+
+- name: create slurm user
+  user: name={{ slurm_user }} uid=105 group=slurm  home={{ slurm_prefix }} system=yes shell=/bin/bash state=present
+
+- name: create slurm directories
+  file: path={{ item }} state=directory owner={{ slurm_user }} mode=0755
+  with_items:
+    - /var/spool/slurmd
+    - /var/log/slurm/state
+
+- name: create slurm var files
+  file: path={{ item }} state=touch owner={{ slurm_user }} group={{ slurm_user }} mode=0644
+  with_items:
+    - /var/log/slurm/slurmctld.log
+    - /var/log/slurm/slurmctld.pid
+    - /var/log/slurm/slurmd.log
+    - /var/log/slurm/slurmd.pid
+    - /var/log/slurm/accounting
+
+
+- include: "hoststuff.yml"
+
+- name: enable slurmd service
+  systemd:
+    name: slurmd
+    enabled: yes
+    state: restarted
+  when: "'workers' in group_names"
+
+- name: enable slurmctld service
+  systemd:
+    name: slurmctld
+    enabled: yes
+    state: restarted
+  when: "'controller' in group_names"
+
+
+
+- name: set path with systemwide bashrc
+  lineinfile:
+    dest=/etc/bashrc
+    line={{ item }}
+    state=present
+  with_items:
+   - "alias serve='python -m SimpleHTTPServer'"
+   - "PATH=$PATH:{{ slurm_prefix }}/bin"
+   - "export PATH"

@@ -1,0 +1,6 @@
+
+- name: download freesufer tarball
+  get_url: url={{ fs_url }} dest=/tmp/freesurfer.tar.gz timeout=120
+
+- name: extract freesufer tarball
+  unarchive: src=/tmp/freesurfer.tar.gz dest=/usr/local remote_src=yes

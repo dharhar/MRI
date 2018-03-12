@@ -1,0 +1,10 @@
+- name: cmake
+  shell: cmake /tmp/ANTs/
+  args:
+    chdir: /usr/local/ants
+
+- name: make    may take a while
+  shell: make
+  args:
+    chdir: /usr/local/ants
+  

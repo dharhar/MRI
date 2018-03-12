@@ -1,0 +1,3 @@
+- include_tasks: headnode.yml
+  when:
+    - "'controller' in group_names"

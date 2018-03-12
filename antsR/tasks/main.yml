@@ -1,0 +1,34 @@
+- name: install R
+  yum: name={{ item }} state=latest
+  with_items:
+    - epel-release
+    - openssl-devel
+    - libcurl-devel
+    - R
+
+
+- name: install ANTsR dependency packages
+  shell: echo 'if (! ("{{item}}" %in% installed.packages()[,"Package"])) install.packages("{{item}}", repos=c("https://www.freestatistics.org/cran/"))' | R --no-save
+  with_items:
+    - Rcpp
+    - signal
+    - timeSeries
+    - mFilter
+    - doParallel
+    - robust
+    - magic
+    - knitr
+    - pixmap
+    - rgl
+    - misc3d
+    - devtools
+    - RcppEigen
+    - magrittr
+
+
+- name: install three big things
+  command: Rscript --no-save -e 'if (! ("{{item}}" %in% installed.packages()[,"Package"])) devtools::install_github("stnava/{{item}}")'
+  with_items:
+    - cmaker
+    - ITKR
+    - ANTsR
