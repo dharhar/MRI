@@ -1,3 +1,12 @@
 - include_tasks: headnode.yml
   when:
     - "'controller' in group_names"
+
+- name: set path
+  lineinfile:
+    dest=/etc/bashrc
+    line={{ item }}
+    state=present
+  with_items:
+   - "PATH=$PATH:/usr/local/shape"
+ 
