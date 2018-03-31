@@ -13,6 +13,8 @@ cluster: slurmy
 
 test_or_real: real
 
+host_stuff: true
+
 workers_params:
   - nodename: cancun
     cpus_per_node: 8
@@ -21,4 +23,6 @@ workers_params:
   - nodename: salsa
     cpus_per_node: 8
   - nodename: vallarta
+    cpus_per_node: 4
+  - nodename: cali
     cpus_per_node: 4
