@@ -1,5 +1,4 @@
-#put these setting in /etc/httpd/conf.d/15-horizon_vost.conf or maybe /etc/httpd/conf/httpd.conf
-#cali works with the first one
+#put these setting in an httpd conf file in /etc/httpd/conf.d/
 
 <VirtualHost *:80>
 
