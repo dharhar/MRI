@@ -1,1 +1,4 @@
 rs_url: https://download2.rstudio.org/rstudio-server-rhel-1.1.423-x86_64.rpm
+
+#install httpd and make rstudio server accessible at hostname.org/rstudio
+proxy_stuff: false

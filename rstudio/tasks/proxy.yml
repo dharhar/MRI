@@ -1,0 +1,16 @@
+- name: install apache2
+  yum:
+    name: httpd
+    state: present
+
+- name: put copy proxy settings
+  copy: src=proxysettings.conf dest=/etc/httpd/conf.d/proxysettings.conf owner=root
+
+- name: enable apache2
+  systemd:
+    name: rstudio-server
+    enabled: yes
+    state: started
+
+- name: make httpd proxy accessible
+  shell: /usr/sbin/setsebool -P httpd_can_network_connect 1

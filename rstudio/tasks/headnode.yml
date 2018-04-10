@@ -13,5 +13,5 @@
     enabled: yes
     state: started
 
-- name: put proxysettings file in etc/httpd
-  copy: src=proxysettings dest=/etc/httpd/proxysettings owner=root
+- include_tasks: proxy.yml
+  when: proxy_stuff = "true"
