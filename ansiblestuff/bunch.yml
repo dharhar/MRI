@@ -1,0 +1,12 @@
+
+- hosts: slurmcluster
+  become: true
+  roles:
+    - role: nfs
+    - role: slurm
+    - role: ants
+    - role: antsR
+    - role: freesurfer
+    - role: shape
+    - role: rstudio
+

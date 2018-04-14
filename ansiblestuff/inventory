@@ -1,0 +1,13 @@
+[slurmcluster:children]
+controller
+workers
+
+[controller]
+rio
+
+[workers]
+rio
+cali
+cancun
+vallarta
+salsa
