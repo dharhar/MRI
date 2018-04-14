@@ -43,22 +43,42 @@
 - include: install.yml
   when: slurm_bin.stat.exists == False
 
-- name: copy slurmctl startup script
+- name: copy slurmctl systemd startup script
   template: src=slurmctld.service.j2 dest=/usr/lib/systemd/system/slurmctld.service owner=root group=root mode=0700
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
 
-- name: copy slurm startup script
+- name: copy slurmd systemd startup script
   template: src=slurmd.service.j2 dest=/usr/lib/systemd/system/slurmd.service owner=root group=root mode=0700
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
+
+- name: copy slurm init startup script
+  template: src=init.d.slurm.j2 dest=/etc/init.d/slurm owner=root group=root mode=0700
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "6"
 
 - name: create config directory
   file: path={{ slurm_prefix }}/etc state=directory owner=root group=root mode=0755
 
-- name: copy slurm config
-  template: src=slurm.conf.j2 dest={{ slurm_prefix }}/etc/slurm.conf owner=root group=root mode=0644
+- name: copy slurm config to uneven clusters
+  template: src=slurm.conf.diff.j2 dest={{ slurm_prefix }}/etc/slurm.conf owner=root group=root mode=0644
+  when: same_or_diff == 'diff'
+
+- name: copy slurm config to uniform clusters
+  template: src=slurm.conf.same.j2 dest={{ slurm_prefix }}/etc/slurm.conf owner=root group=root mode=0644
+  when: same_or_diff == 'same'
 
 - name: copy slurmdbd config example
   copy: src=slurmdbd.conf.example dest={{ slurm_prefix }}/etc owner=root group=root mode=0644
+
+- name: copy test script
+  copy: src=test.sh dest=/home/{{ test_user }}/ owner={{ test_user }} mode=0777
+  when:
+    - "'controller' in group_names"
+
+- name: copy kill/resume scripts
+  template: src={{ item }} dest=/{{ slurm_prefix }}/bin  owner={{ slurm_user }}  mode=0777
+  with_items:
+    - nodekill
+    - resume
 
 - name: create slurm group
   group: name=slurm gid=105 state=present
@@ -81,6 +101,21 @@
     - /var/log/slurm/slurmd.pid
     - /var/log/slurm/accounting
 
+- name: open firewall port on headnode
+  shell: iptables -A INPUT -p tcp -m tcp --dport 6817 -m conntrack --ctstate NEW -j ACCEPT
+  #shell: iptables -A IN_public_allow -p tcp -m tcp --dport 6817 -m conntrack --ctstate NEW -j ACCEPT
+  #shell: firewall-cmd --permanent --add-port 6817
+  when:
+    - open_fire
+    - "'controller' in group_names"
+
+- name: open firewall port on compute nodes
+  shell: iptables -A INPUT -p tcp -m tcp --dport 6818 -m conntrack --ctstate NEW -j ACCEPT
+  #shell: iptables -A IN_public_allow -p tcp -m tcp --dport 6818 -m conntrack --ctstate NEW -j ACCEPT
+  #shell: firewall-cmd --permanent --add-port 6818
+  when:
+    - open_fire
+    - "'workers' in group_names"
 
 - include: "hoststuff.yml"
   when: host_stuff
@@ -90,7 +125,9 @@
     name: slurmd
     enabled: yes
     state: restarted
-  when: "'workers' in group_names"
+  when:
+    - "'workers' in group_names"
+    - ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
 
 - name: enable slurmctld service
   systemd:
@@ -98,8 +135,14 @@
     enabled: yes
     state: restarted
   when: "'controller' in group_names"
+    - "'controller' in group_names"
+    - ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
 
 
+- name: start slurm service
+  service:
+    name: slurm
+    state: started
 
 - name: set path with systemwide bashrc
   lineinfile:
