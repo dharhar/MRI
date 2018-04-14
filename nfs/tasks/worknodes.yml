@@ -1,17 +1,22 @@
 
-- name: mount shared home dir
+- name: mount shared prog dir
   mount:
-    path: /mnt
-    src: "{{ head_node }}:/mnt"
+    path: /usr/local
+    src: rio:/usr/local
     fstype: nfs
     opts: rw,hard,rsize=8192,wsize=8192,timeo=14
     state: mounted
   when: "'controller' not in group_names"
 
-- name: mount shared prog dir
+- name: create U2 dir
+  file: path={{ item }} state=directory owner=root mode=0755
+  with_items:
+    - /U2
+
+- name: mount iscsi mpath dir
   mount:
-    path: /usr/local
-    src: "{{ head_node }}:/usr/local"
+    path: /U2
+    src: rio:/U2
     fstype: nfs
     opts: rw,hard,rsize=8192,wsize=8192,timeo=14
     state: mounted

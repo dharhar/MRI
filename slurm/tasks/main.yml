@@ -83,7 +83,7 @@
 
 
 - include: "hoststuff.yml"
-  when: host_stuff = "true"
+  when: host_stuff
 
 - name: enable slurmd service
   systemd:

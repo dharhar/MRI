@@ -8,12 +8,12 @@ slurm_user: slurm
 #cpus_per_node: 1
 
 munge_passwd: slurmz1
-partition_name: calitest
+partition_name: rioclus
 cluster: slurmy
 
 test_or_real: real
 
-host_stuff: true
+host_stuff: false
 
 workers_params:
   - nodename: cancun
