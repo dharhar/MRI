@@ -134,7 +134,7 @@
     name: slurmctld
     enabled: yes
     state: restarted
-  when: "'controller' in group_names"
+  when:
     - "'controller' in group_names"
     - ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
 
@@ -143,6 +143,8 @@
   service:
     name: slurm
     state: started
+  when:
+    - ansible_distribution == 'CentOS' and ansible_distribution_major_version == "6"
 
 - name: set path with systemwide bashrc
   lineinfile:

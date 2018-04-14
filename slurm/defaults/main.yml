@@ -7,7 +7,7 @@ slurm_prefix: /opt/slurm/{{ slurm_version }}
 slurm_user: slurm
 
 #home directoy to place test script
-test_user: nfuser
+test_user: vagrant
 munge_passwd: slurmz1
 partition_name: rioclus
 cluster: slurmy
@@ -20,7 +20,7 @@ test_or_real: test
 host_stuff: true
 
 #open firewall port. check shell command in tasks/main.yml. not idempotent (true/false)
-open_fire: true
+open_fire: false
 
 #cpus per node
 same_or_diff: same
