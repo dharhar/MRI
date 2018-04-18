@@ -13,4 +13,8 @@
     state: started
 
 - name: make httpd proxy accessible
-  shell: /usr/sbin/setsebool -P httpd_can_network_connect 1
+  #shell: /usr/sbin/setsebool -P httpd_can_network_connect 1
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
