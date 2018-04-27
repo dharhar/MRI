@@ -3,6 +3,7 @@
   with_items:
     - libpng12
     - libmng
+    - time
 
 - name: put lines in bashrc
   lineinfile:

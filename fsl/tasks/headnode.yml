@@ -1,3 +1,4 @@
+
 - stat: path=/usr/local/fsl/bin
   register: fsl_bin
 
@@ -6,11 +7,14 @@
   when: not fsl_bin.stat.exists
 
 - name: run install script
-  shell: /tmp/fslinstaller.py -E -q -d /usr/local
+  shell: /tmp/fslinstaller.py -E -q -d /usr/local/fsl
   when: not fsl_bin.stat.exists
 
-#- name: install fslpython
-  #shell: /usr/local/fsl/etc/fslconf/fslpython_install.sh
-  #when: looks like already done
+- stat: path=/usr/local/fsl/fslpython
+  register: fsl_python
+
+- name: install fslpython
+  shell: /usr/local/fsl/etc/fslconf/fslpython_install.sh -f /usr/local/fsl
+  when: not fsl_python.stat.exists
 
 
