@@ -1,0 +1,20 @@
+- name: install prereqs
+  yum: name={{ item }} state=present
+  with_items:
+    - libpng12
+    - libmng
+
+- name: put lines in bashrc
+  lineinfile:
+    dest=/etc/bashrc
+    line={{ item }}
+    state=present
+  with_items:
+   - "FSLDIR=/usr/local/fsl"
+   - ". ${FSLDIR}/etc/fslconf/fsl.sh"
+   - "PATH=${FSLDIR}/bin:${PATH}"
+   - "export FSLDIR PATH"
+
+- include_tasks: headnode.yml
+  when:
+    - "'controller' in group_names"

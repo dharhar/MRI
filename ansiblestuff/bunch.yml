@@ -9,4 +9,5 @@
     - role: freesurfer
     - role: shape
     - role: rstudio
+    - role: fsl
 

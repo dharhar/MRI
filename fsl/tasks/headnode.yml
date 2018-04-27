@@ -1,0 +1,16 @@
+- stat: path=/usr/local/fsl/bin
+  register: fsl_bin
+
+- name: copy fsl installer script
+  copy: src=fslinstaller.py dest=/tmp owner=root group=root mode=0755
+  when: not fsl_bin.stat.exists
+
+- name: run install script
+  shell: /tmp/fslinstaller.py -E -q -d /usr/local
+  when: not fsl_bin.stat.exists
+
+#- name: install fslpython
+  #shell: /usr/local/fsl/etc/fslconf/fslpython_install.sh
+  #when: looks like already done
+
+

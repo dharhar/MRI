@@ -10,6 +10,7 @@ These roles are all designed to work on the same inventory file. Here's what the
 - Freesurfer: Brain scan processing. The batch scripts depend on slurm.
 - Shape: Brain scan processing. The batch scripts depend on slurm.
 - Rstudio: Rstudio Server. Does not rely on slurm.
+- FSL: Brain scan processing. Under contruction.
 
 
 Platforms
